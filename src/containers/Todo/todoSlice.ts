@@ -3,7 +3,7 @@ import axiosApi from '../../axiosApi';
 import {RootState} from '../../app/store';
 
 interface Todo {
-  id: string;
+  id?: string;
   title: string;
   completed: boolean;
 }
@@ -20,14 +20,18 @@ const initialState: TodoState = {
   error: false,
 };
 
-export const fetchTodo = createAsyncThunk<Todo[], void, { state: RootState }>('todo/fetch', async () => {
-    const {data: todo} = await axiosApi.get<Todo[] | null>('/todo.json');
-    return todo;
+export const fetchTodo = createAsyncThunk<Todo[], void, { state: RootState }>('todo/fetch',
+  async () => {
+    const {data: todo} = await axiosApi.get<{ [id: string]: Todo }>('/todo.json');
+    return Object.keys(todo).map(id => ({
+      id,
+      ...todo[id]
+    }));
   }
 );
 
-export const addTodo = createAsyncThunk<Todo, void, { state: RootState }>('todo/addTodo', async () => {
-    const {data: todo} = await axiosApi.post<Todo | null>('/todo.json');
+export const addTodo = createAsyncThunk<Todo, Todo, { state: RootState }>('todo/addTodo', async (newTodo) => {
+    const {data: todo} = await axiosApi.post<Todo | null>('/todo.json', newTodo);
     return todo;
   }
 );
@@ -38,8 +42,9 @@ export const editTodo = createAsyncThunk<void, void, { state: RootState }>('todo
   }
 );
 
-export const deleteTodo = createAsyncThunk<string, string, { state: RootState }>('todo/deleteTodo', async (id) => {
-    await axiosApi.delete('/todo/${id}.json');
+export const deleteTodo = createAsyncThunk<string, string, { state: RootState }>('todo/deleteTodo',
+  async (id) => {
+    await axiosApi.delete(`/todo/${id}.json`);
     return id;
   }
 );
@@ -70,6 +75,7 @@ export const todoSlice = createSlice({
       })
       .addCase(addTodo.fulfilled, (state: TodoState, action: PayloadAction<Todo>) => {
         state.todo.push(action.payload);
+        state.loading = false;
       })
       .addCase(addTodo.rejected, (state: TodoState) => {
         state.loading = false;
@@ -92,6 +98,7 @@ export const todoSlice = createSlice({
       })
       .addCase(deleteTodo.fulfilled, (state: TodoState, action: PayloadAction<string>) => {
         state.todo = state.todo.filter(todo => todo.id !== action.payload);
+        state.loading = false;
       })
       .addCase(deleteTodo.rejected, (state: TodoState) => {
         state.loading = false;

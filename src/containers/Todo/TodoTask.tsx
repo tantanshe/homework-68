@@ -10,11 +10,15 @@ interface TodoTaskProps {
 const TodoTask: React.FC<TodoTaskProps> = ({ id, title }) => {
   const dispatch = useDispatch();
 
+  const handleDelete = () => {
+    dispatch(deleteTodo(id));
+  };
+
   return (
-    <li>
+    <>
       {title}
-      <button onClick={() => dispatch(deleteTodo(id))}>Delete</button>
-    </li>
+      <button onClick={handleDelete}>Delete</button>
+    </>
   );
 };
 
