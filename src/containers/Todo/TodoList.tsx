@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchTodo} from './todoSlice';
 import TodoTask from './TodoTask';
 import {RootState} from '../../app/store';
+import Spinner from '../../components/Spinner/Spinner';
 
 const TodoList = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ const TodoList = () => {
   }, [dispatch]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Spinner/>;
   }
 
   if (!todos || todos.length === 0) {
@@ -22,13 +23,13 @@ const TodoList = () => {
   }
 
   return (
-    <ul>
+    <div>
       {todos.map((todo) => (
-        <li key={todo.id}>
+        <div key={todo.id} className="mb-3 p-2 border rounded">
           <TodoTask id={todo.id} {...todo} />
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };
 

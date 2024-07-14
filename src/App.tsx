@@ -6,6 +6,7 @@ const App = () => {
 
   return (
     <>
+      <h1 className='text-center'>To-do list</h1>
       <TodoForm/>
       <TodoList/>
     </>

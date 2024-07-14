@@ -13,19 +13,22 @@ const TodoForm = () => {
       completed: false,
     };
     await dispatch(addTodo(newTask));
-    await dispatch(fetchTodo())
+    await dispatch(fetchTodo());
     setTitle('');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="New task"
-      />
-      <button type="submit">Add Task</button>
+    <form onSubmit={handleSubmit} className="mb-3 mt-3">
+      <div className="form-group">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="New task"
+          className="form-control"
+        />
+        <button type="submit" className="btn btn-primary mt-3">Add Task</button>
+      </div>
     </form>
   );
 };

@@ -22,7 +22,7 @@ const initialState: TodoState = {
 
 export const fetchTodo = createAsyncThunk<Todo[], void, { state: RootState }>('todo/fetch',
   async () => {
-    const {data: todo} = await axiosApi.get<{ [id: string]: Todo }>('/todo.json');
+    const {data: todo} = await axiosApi.get<{ [id: string]: Todo }>(`/todo.json`);
     return Object.keys(todo).map(id => ({
       id,
       ...todo[id]
@@ -31,14 +31,15 @@ export const fetchTodo = createAsyncThunk<Todo[], void, { state: RootState }>('t
 );
 
 export const addTodo = createAsyncThunk<Todo, Todo, { state: RootState }>('todo/addTodo', async (newTodo) => {
-    const {data: todo} = await axiosApi.post<Todo | null>('/todo.json', newTodo);
+    const {data: todo} = await axiosApi.post<Todo | null>(`/todo.json`, newTodo);
     return todo;
   }
 );
 
-export const editTodo = createAsyncThunk<void, void, { state: RootState }>('todo/editTodo', async () => {
-    const {data: todo} = await axiosApi.put<Todo | null>('/todo/${id}.json');
-    return todo;
+export const editTodo = createAsyncThunk<void, { id: string, updatedTodo: Todo }, {
+  state: RootState
+}>('todo/editTodo', async ({id, updatedTodo}) => {
+    await axiosApi.put<Todo>(`/todo/${id}.json`, updatedTodo);
   }
 );
 
@@ -65,7 +66,7 @@ export const todoSlice = createSlice({
         state.loading = false;
         state.todo = action.payload;
       })
-      .addCase(fetchTodo.rejected, (state: TodoState, action) => {
+      .addCase(fetchTodo.rejected, (state: TodoState) => {
         state.loading = false;
         state.error = true;
       })
